@@ -1,0 +1,63 @@
+{
+  "name": "gymote",
+  "version": "0.0.1",
+  "description": "Use your phone as a remote pointing device",
+  "author": "Jan Hug <me@dulnan.net>",
+  "private": true,
+  "license": "MIT",
+  "keywords": [
+    "phone",
+    "remote",
+    "pointing",
+    "cursor",
+    "gyroscope"
+  ],
+  "files": [
+    "dist",
+    "src",
+    "LICENSE",
+    "README.md"
+  ],
+  "main": "lib/gymote.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dulnan/gymote.git"
+  },
+  "scripts": {
+    "build": "webpack --env dev && webpack --env build && npm run test",
+    "dev": "webpack --progress --colors --watch --env dev",
+    "test": "mocha --require babel-register --colors ./test/*.spec.js",
+    "test:watch": "mocha --require babel-register --colors -w ./test/*.spec.js"
+  },
+  "dependencies": {
+    "eventemitter3": "^3.1.0",
+    "gyro-plane": "^1.0.0",
+    "lazy-brush": "^1.0.0",
+    "socketpeer": "github:dulnan/socketpeer#update-dependencies"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.0.0-beta.51",
+    "@babel/core": "^7.0.0-beta.51",
+    "@babel/preset-env": "^7.0.0-beta.51",
+    "babel-eslint": "^8.0.3",
+    "babel-loader": "^8.0.0-beta.4",
+    "babel-plugin-add-module-exports": "^0.2.1",
+    "babel-preset-env": "^7.0.0-beta.3",
+    "babel-register": "^7.0.0-beta.3",
+    "chai": "^4.1.2",
+    "eslint": "^5.8.0",
+    "eslint-config-standard": "^12.0.0",
+    "eslint-loader": "^2.0.0",
+    "eslint-plugin-import": "^2.14.0",
+    "eslint-plugin-node": "^8.0.0",
+    "eslint-plugin-promise": "^4.0.1",
+    "eslint-plugin-standard": "^4.0.0",
+    "jsdom": "11.11.0",
+    "jsdom-global": "3.0.2",
+    "mocha": "^4.0.1",
+    "uglifyjs-webpack-plugin": "^1.2.7",
+    "webpack": "^4.12.2",
+    "webpack-cli": "^3.0.8",
+    "yargs": "^10.0.3"
+  }
+}
