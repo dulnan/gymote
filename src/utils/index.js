@@ -1,3 +1,12 @@
+/**
+ * Encode the remote data for sending to the screen.
+ *
+ * @param {ScreenPoint} coordinates The pointer position.
+ * @param {Boolean} isClicking The click status.
+ * @param {ScreenPoint} touch The coordinates of the touch.
+ *
+ * @returns {String} The string representation of the data.
+ */
 export function encodeRemoteData (coordinates, isClicking, touch) {
   return [
     coordinates.x,
@@ -8,6 +17,12 @@ export function encodeRemoteData (coordinates, isClicking, touch) {
   ].join(';')
 }
 
+/**
+ * Decode the remote data string.
+ *
+ * @param {String} data The string representation of the data.
+ * @returns {Object}
+ */
 export function decodeRemoteData (data) {
   const arr = data.split(';')
   const x = parseInt(arr[0])

@@ -1,34 +1,27 @@
-// import Smoothing from './Smoothing'
-
 import GyroNorm from 'gyronorm'
+import { GYRONORM_OPTIONS } from '@/utils'
+
 require('@hughsk/fulltilt/dist/fulltilt.min.js')
 
-const GYRONORM_OPTIONS = {
-  frequency: 5,
-  decimalCount: 6
-}
-
-// let smoothAlpha = new Smoothing()
-// let smoothBeta = new Smoothing()
-
+/**
+ * Initializes GyroNorm for reading the orientation from the gyroscope.
+ */
 export default class Gyroscope {
   constructor () {
-    this.gyronorm = null
+    this.gyronorm = new GyroNorm()
+
     this.hasGyroscope = false
 
     this.alpha = 0
     this.beta = 0
 
-    this.initGyroscope()
+    this.initGyroNorm()
   }
 
-  get rounding () {
-    return this.isClicking ? 100 : 25
-  }
-
-  initGyroscope () {
-    this.gyronorm = new GyroNorm()
-
+  /**
+   * Initialize GyroNorm.
+   */
+  initGyroNorm () {
     this.gyronorm.init(GYRONORM_OPTIONS).then(() => {
       const isAvailable = this.gyronorm.isAvailable()
 
@@ -47,6 +40,12 @@ export default class Gyroscope {
     })
   }
 
+  /**
+   * Return the rounded device orientation values.
+   *
+   * @param {Number} rounding The rounding precision.
+   * @returns {DeviceOrientation} The orientation.
+   */
   getOrientation (rounding = 1) {
     return {
       alpha: Math.round(this.alpha * rounding) / rounding,

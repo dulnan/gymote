@@ -1,8 +1,14 @@
 import SocketPeer from 'socketpeer'
 import EventEmitter from 'eventemitter3'
-// import { parseDataString } from './utils/index.js'
 
+/**
+ * The connection handler wraps SocketPeer for sending and receiving messages
+ * via WebRTC or WebSockets.
+ */
 export default class Connection extends EventEmitter {
+  /**
+   * @param {String} serverUrl The URL of the gymote server.
+   */
   constructor (serverUrl) {
     super()
 
@@ -19,6 +25,9 @@ export default class Connection extends EventEmitter {
     this.initSocketPeer()
   }
 
+  /**
+   * Initialize SocketPeer by adding event listeners.
+   */
   initSocketPeer () {
     this.peer.on('connect', () => {
       this._isConnected = true
@@ -36,10 +45,7 @@ export default class Connection extends EventEmitter {
 
     this.peer.on('connect_timeout', () => this.emit('connectionTimeout'))
     this.peer.on('upgrade_error', () => this.emit('usingFallback'))
-
-    // this.peer.on('connect_error', () => {
-    //   console.log('connect_error')
-    // })
+    this.peer.on('connect_error', () => this.emit('connectError'))
 
     this.peer.on('error', (data) => {
       this._isConnected = false
@@ -47,28 +53,23 @@ export default class Connection extends EventEmitter {
     })
   }
 
-  loadStoredPairings () {
-    this.pairingManager.getStoredPairing((pairing) => {
-      if (pairing) {
-        this.emit('restorable', pairing)
-      }
-    })
-  }
-
-  deleteStoredPairing (pairing) {
-    this.pairingManager.deletePairing(pairing)
-  }
-
-  isConnected () {
-    return this._isConnected
-  }
-
+  /**
+   * Connect to the other device of the given pairing.
+   *
+   * @param {Pairing} pairing
+   */
   connect (pairing) {
     this.pairing = pairing
     this.peer.pairCode = pairing.hash
     this.peer.connect()
   }
 
+  /**
+   * Sends a message to the other device.
+   *
+   * @param {String} name The name of the message.
+   * @param {String} data The data to be sent.
+   */
   send (name, data) {
     if (!this.isConnected()) {
       return
@@ -76,5 +77,12 @@ export default class Connection extends EventEmitter {
 
     const message = name + '~' + data
     this.peer.send(message)
+  }
+
+  /**
+   * @returns {Boolean}
+   */
+  isConnected () {
+    return this._isConnected
   }
 }

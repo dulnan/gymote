@@ -1,13 +1,25 @@
+import Cookies from 'js-cookie'
 import Pairing from './Pairing'
 
-import Cookies from 'js-cookie'
-
+/**
+ * Manages the initialization, validation and storing of pairings.
+ */
 export default class PairingManager {
+  /**
+   * @param {String} serverUrl The URL of the gymote server.
+   * @param {*} http A http client, for example axios.
+   */
   constructor (serverUrl, http) {
     this.serverUrl = serverUrl
     this._http = http
   }
 
+  /**
+   * Check for pairings stored in a cookie, validate them and return them.
+   *
+   * @param {Function} cb The callback, receiving a pairing or nothing as an
+   * argument.
+   */
   getStoredPairing (cb) {
     const cookie = Cookies.get('pairing')
 
@@ -29,6 +41,11 @@ export default class PairingManager {
     }
   }
 
+  /**
+   * Request a new pairing from the server.
+   *
+   * @returns {Pairing}
+   */
   async requestPairing () {
     let response = false
 
@@ -47,6 +64,12 @@ export default class PairingManager {
     }
   }
 
+  /**
+   * Given a code, get the corresponding pairing.
+   *
+   * @param {Number} code The code to get the pairing from.
+   * @returns {Pairing}
+   */
   async getHash (code) {
     const response = await this._http.post(this.serverUrl + '/code/validate', {
       code: code
@@ -62,10 +85,18 @@ export default class PairingManager {
     return {}
   }
 
+  /**
+   * Save the given pairing in a cookie.
+   *
+   * @param {Pairing} pairing The pairing to save.
+   */
   savePairing (pairing) {
     Cookies.set('pairing', pairing.toString())
   }
 
+  /**
+   * Delete all pairing cookies.
+   */
   deletePairing () {
     Cookies.remove('pairing')
   }
