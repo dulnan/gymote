@@ -1,6 +1,6 @@
 import Pairing from './Pairing'
 
-import { getCookie, setCookie, eraseCookie } from 'utils'
+import Cookies from 'js-cookie'
 
 export default class PairingManager {
   constructor (serverUrl, http) {
@@ -9,7 +9,7 @@ export default class PairingManager {
   }
 
   getStoredPairing (cb) {
-    const cookie = getCookie('pairing')
+    const cookie = Cookies.get('pairing')
 
     if (cookie) {
       try {
@@ -63,10 +63,10 @@ export default class PairingManager {
   }
 
   savePairing (pairing) {
-    setCookie('pairing', pairing.toString(), 1)
+    Cookies.set('pairing', pairing.toString())
   }
 
   deletePairing () {
-    eraseCookie('pairing')
+    Cookies.remove('pairing')
   }
 }

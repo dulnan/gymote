@@ -30,10 +30,11 @@
     "test:watch": "mocha --require babel-register --colors -w ./test/*.spec.js"
   },
   "dependencies": {
+    "@hughsk/fulltilt": "^0.7.1",
     "eventemitter3": "^3.1.0",
     "gyro-plane": "^1.0.0",
     "gyronorm": "^2.0.6",
-    "@hughsk/fulltilt": "^0.7.1",
+    "js-cookie": "^2.2.0",
     "lazy-brush": "^1.0.0",
     "socketpeer": "github:dulnan/socketpeer#master"
   },
