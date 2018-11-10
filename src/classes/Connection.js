@@ -35,6 +35,7 @@ export default class Connection extends EventEmitter {
     })
 
     this.peer.on('connect_timeout', () => this.emit('connectionTimeout'))
+    this.peer.on('upgrade_error', () => this.emit('usingFallback'))
 
     // this.peer.on('connect_error', () => {
     //   console.log('connect_error')

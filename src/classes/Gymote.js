@@ -17,6 +17,10 @@ export default class Gymote extends EventEmitter {
     this.connection.on('connected', () => {
       this.emit('connected')
     })
+
+    this.connection.on('usingFallback', () => {
+      this.emit('usingFallback')
+    })
   }
 
   loadStoredPairings () {
