@@ -1,22 +1,27 @@
-export function buildDataString (alpha, beta, isPressingMain, touchDiffY) {
-  const values = [
-    alpha,
-    beta,
-    isPressingMain ? 1 : 0,
-    touchDiffY
-  ]
-  return values.join(';')
+export function encodeRemoteData (coordinates, isClicking, touch) {
+  return [
+    coordinates.x,
+    coordinates.y,
+    isClicking ? 1 : 0,
+    touch.x,
+    touch.y
+  ].join(';')
 }
 
-export function parseDataString (data) {
+export function decodeRemoteData (data) {
   const arr = data.split(';')
-  const alpha = Math.round(((parseFloat(arr[0]) + 180) % 360) * 100) / 100
-  const beta = Math.round(parseFloat(arr[1]) * 100) / 100
+  const x = parseInt(arr[0])
+  const y = parseInt(arr[1])
   return {
-    alpha: alpha,
-    beta: beta,
-    isPressingMain: arr[2] === '1',
-    touchDiffY: parseInt(arr[3]) || 0
+    coordinates: {
+      x,
+      y
+    },
+    isClicking: arr[2] === '1',
+    touch: {
+      x: parseInt(arr[3]) || 0,
+      y: parseInt(arr[4]) || 0
+    }
   }
 }
 

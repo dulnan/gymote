@@ -1,4 +1,4 @@
-import SocketPeer from 'socketpeer/browser'
+import SocketPeer from 'socketpeer'
 import EventEmitter from 'eventemitter3'
 // import { parseDataString } from './utils/index.js'
 
@@ -27,6 +27,11 @@ export default class Connection extends EventEmitter {
 
     this.peer.on('close', () => {
       this._isConnected = false
+    })
+
+    this.peer.on('data', (message) => {
+      const [ name, data ] = message.split('~')
+      this.emit(name, data)
     })
 
     this.peer.on('connect_timeout', () => this.emit('connectionTimeout'))
@@ -68,9 +73,8 @@ export default class Connection extends EventEmitter {
       return
     }
 
-    this.peer.send(JSON.stringify({
-      name: name,
-      data: data
-    }))
+    const message = name + '~' + data
+    console.log(message)
+    this.peer.send(message)
   }
 }

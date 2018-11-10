@@ -13,12 +13,6 @@ export default class Gymote {
     this.on = this.connection.on.bind(this.connection)
     this.off = this.connection.off.bind(this.connection)
     this.emit = this.connection.emit.bind(this.connection)
-
-    this.connection.on('connected', this.handleConnected.bind(this))
-  }
-
-  handleConnected (pairing) {
-    this.pairingManager.savePairing(pairing)
   }
 
   loadStoredPairings () {
@@ -39,16 +33,5 @@ export default class Gymote {
 
   connect (pairing) {
     this.connection.connect(pairing)
-  }
-
-  send (name, data) {
-    if (!this.isConnected()) {
-      return
-    }
-
-    this.connection.send(JSON.stringify({
-      name: name,
-      data: data
-    }))
   }
 }
