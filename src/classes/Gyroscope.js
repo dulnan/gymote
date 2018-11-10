@@ -1,5 +1,5 @@
 import GyroNorm from 'gyronorm'
-import { GYRONORM_OPTIONS } from '@/utils'
+import { GYRONORM_OPTIONS } from './../utils'
 
 require('@hughsk/fulltilt/dist/fulltilt.min.js')
 
