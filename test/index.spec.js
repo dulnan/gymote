@@ -2,7 +2,7 @@
 
 import chai from 'chai'
 import axios from 'axios'
-import Gymote from '../lib/gymote.js'
+import { GymoteScreen } from '../lib/gymote.js'
 
 chai.expect()
 
@@ -12,7 +12,7 @@ let lib
 
 describe('Given an instance of my Gymote library', () => {
   before(() => {
-    lib = new Gymote('http://localhost:3000', axios)
+    lib = new GymoteScreen('http://localhost:3000', axios)
   })
   describe('when I need the connection status', () => {
     it('should return the connection status', () => {

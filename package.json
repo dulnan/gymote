@@ -32,6 +32,8 @@
   "dependencies": {
     "eventemitter3": "^3.1.0",
     "gyro-plane": "^1.0.0",
+    "gyronorm": "^2.0.6",
+    "@hughsk/fulltilt": "^0.7.1",
     "lazy-brush": "^1.0.0",
     "socketpeer": "github:dulnan/socketpeer#update-dependencies"
   },
@@ -39,9 +41,11 @@
     "@babel/cli": "^7.0.0-beta.51",
     "@babel/core": "^7.0.0-beta.51",
     "@babel/preset-env": "^7.0.0-beta.51",
+    "axios": "^0.18.0",
     "babel-eslint": "^8.0.3",
     "babel-loader": "^8.0.0-beta.4",
     "babel-plugin-add-module-exports": "^0.2.1",
+    "babel-polyfill": "^6.26.0",
     "babel-preset-env": "^7.0.0-beta.3",
     "babel-register": "^7.0.0-beta.3",
     "chai": "^4.1.2",
