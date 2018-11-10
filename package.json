@@ -35,7 +35,7 @@
     "gyronorm": "^2.0.6",
     "@hughsk/fulltilt": "^0.7.1",
     "lazy-brush": "^1.0.0",
-    "socketpeer": "github:dulnan/socketpeer#update-dependencies"
+    "socketpeer": "github:dulnan/socketpeer#master"
   },
   "devDependencies": {
     "@babel/cli": "^7.0.0-beta.51",

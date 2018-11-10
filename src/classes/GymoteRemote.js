@@ -32,6 +32,7 @@ export default class GymoteRemote extends Gymote {
 
     this.connection.on('connected', this.onConnected.bind(this))
     this.connection.on(MESSAGE.SCREEN_VIEWPORT, this.onScreenViewport.bind(this))
+    this.connection.on(MESSAGE.SCREEN_DISTANCE, this.onScreenDistance.bind(this))
   }
 
   onConnected (pairing) {
@@ -42,6 +43,11 @@ export default class GymoteRemote extends Gymote {
   onScreenViewport (data) {
     const viewport = JSON.parse(data)
     this.gyro.setScreenDimensions(viewport)
+  }
+
+  onScreenDistance (data) {
+    const viewport = parseInt(data)
+    this.gyro.setDistance(viewport)
   }
 
   loop () {
@@ -66,10 +72,6 @@ export default class GymoteRemote extends Gymote {
   async getPairingByCode (code) {
     const pairing = await this.pairingManager.getHash(code)
     return pairing
-  }
-
-  updateViewport (viewport) {
-    this.viewport = viewport
   }
 
   updateClick (isClicking) {

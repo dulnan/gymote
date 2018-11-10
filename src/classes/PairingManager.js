@@ -8,20 +8,24 @@ export default class PairingManager {
     this._http = http
   }
 
-  async getStoredPairing (cb) {
+  getStoredPairing (cb) {
     const cookie = getCookie('pairing')
 
     if (cookie) {
-      const pairing = JSON.parse(cookie)
-      this._http.post(this.serverUrl + '/pairing/validate', pairing).then((response) => {
-        const isValid = response.data.isValid
-        if (isValid) {
-          cb(new Pairing(pairing))
-        } else {
-          this.deletePairing(pairing)
-          cb()
-        }
-      })
+      try {
+        const pairing = JSON.parse(cookie)
+        this._http.post(this.serverUrl + '/pairing/validate', pairing).then((response) => {
+          const isValid = response.data.isValid
+          if (isValid) {
+            cb(new Pairing(pairing))
+          } else {
+            this.deletePairing(pairing)
+            cb()
+          }
+        })
+      } catch (e) {
+        this.deletePairing()
+      }
     }
   }
 
@@ -49,10 +53,10 @@ export default class PairingManager {
     })
 
     if (response.data.code && response.data.hash) {
-      return {
+      return new Pairing({
         hash: response.data.hash,
         code: response.data.code
-      }
+      })
     }
 
     return {}

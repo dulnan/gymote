@@ -74,7 +74,6 @@ export default class Connection extends EventEmitter {
     }
 
     const message = name + '~' + data
-    console.log(message)
     this.peer.send(message)
   }
 }

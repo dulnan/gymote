@@ -38,6 +38,10 @@ export default class GymoteScreen extends Gymote {
     this.connection.send(MESSAGE.SCREEN_VIEWPORT, JSON.stringify(viewport))
   }
 
+  updateDistance (distance) {
+    this.connection.send(MESSAGE.SCREEN_DISTANCE, distance.toString())
+  }
+
   async getPairing () {
     const pairing = await this.pairingManager.requestPairing()
     return pairing
