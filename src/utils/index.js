@@ -25,8 +25,8 @@ export function encodeRemoteData (coordinates, isClicking, touch) {
  */
 export function decodeRemoteData (data) {
   const arr = data.split(';')
-  const x = parseInt(arr[0])
-  const y = parseInt(arr[1])
+  const x = parseFloat(arr[0])
+  const y = parseFloat(arr[1])
   return {
     coordinates: {
       x,

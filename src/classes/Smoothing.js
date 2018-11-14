@@ -2,10 +2,10 @@
  * Slowly ease a value to a new value.
  */
 export default class Smoothing {
-  constructor () {
+  constructor (amount) {
     this.prev = 0
     this.prevRaw = 0
-    this.smoothing = 0.08
+    this.smoothing = amount
   }
 
   /**

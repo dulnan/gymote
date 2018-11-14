@@ -89,6 +89,9 @@ export default class GymoteRemote extends Gymote {
    * this instance's state.
    */
   loop () {
+    if (!this.connection.isConnected()) {
+      return
+    }
     // When not clicking the orientation values can be rounded more, so that
     // less messages are sent.
     const rounding = this.isClicking ? 100 : 25
@@ -104,7 +107,7 @@ export default class GymoteRemote extends Gymote {
     const { x, y } = this.lazy.getBrushCoordinates()
 
     // Build the data string for the message.
-    const remoteDataString = encodeRemoteData({ x: Math.round(x), y: Math.round(y) }, this.isClicking, this.touch)
+    const remoteDataString = encodeRemoteData({ x: Math.round(x * 10) / 10, y: Math.round(y * 10) / 10 }, this.isClicking, this.touch)
 
     // Only send the message if it actually has changed.
     if (remoteDataString !== this.prevDataString) {
@@ -141,7 +144,8 @@ export default class GymoteRemote extends Gymote {
    * of the viewport.
    */
   calibrate () {
-    const offset = this.gyroscope.getOrientation()
-    this.gyroplane.updateOffset(offset)
+    // const offset = this.gyroscope.getOrientation()
+    this.gyroscope.center()
+    // this.gyroplane.updateOffset(offset)
   }
 }

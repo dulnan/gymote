@@ -6,6 +6,6 @@ export const MESSAGE = {
 }
 
 export const GYRONORM_OPTIONS = {
-  frequency: 16,
-  decimalCount: 3
+  frequency: 5,
+  decimalCount: 7
 }

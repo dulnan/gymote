@@ -1,5 +1,5 @@
 import GyroNorm from 'gyronorm'
-import { GYRONORM_OPTIONS } from './../utils'
+import { GYRONORM_OPTIONS } from './../settings'
 
 require('@hughsk/fulltilt/dist/fulltilt.min.js')
 
@@ -51,5 +51,9 @@ export default class Gyroscope {
       alpha: Math.round(this.alpha * rounding) / rounding,
       beta: Math.round(this.beta * rounding) / rounding
     }
+  }
+
+  center () {
+    this.gyronorm.setHeadDirection()
   }
 }

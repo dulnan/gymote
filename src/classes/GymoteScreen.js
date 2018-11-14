@@ -1,4 +1,5 @@
-import Gymote from './Gymote.js'
+import Gymote from './Gymote'
+import Smoothing from './Smoothing'
 
 import { decodeRemoteData } from './../utils/index.js'
 import { MESSAGE } from './../settings'
@@ -15,6 +16,9 @@ export default class GymoteScreen extends Gymote {
     super(serverUrl, http)
 
     this.isClicking = false
+
+    this.smoothX = new Smoothing(0.3)
+    this.smoothY = new Smoothing(0.3)
 
     this.connection.on(MESSAGE.REMOTE_DATA, this.onRemoteData.bind(this))
   }
@@ -37,17 +41,20 @@ export default class GymoteScreen extends Gymote {
    * @param {String} data The data from the Remote.
    */
   onRemoteData (data) {
-    const { coordinates, isClicking, touch } = decodeRemoteData(data)
+    const remoteData = decodeRemoteData(data)
 
-    this.emit('touch', touch)
-    this.emit('pointermove', coordinates)
+    const x = this.smoothX.next(remoteData.coordinates.x)
+    const y = this.smoothY.next(remoteData.coordinates.y)
+
+    this.emit('touch', remoteData.touch)
+    this.emit('pointermove', { x, y })
 
     // Check if isClicking has changed since the last time. If it has, then emit
     // the corresponding pointer event.
-    if (isClicking !== this.isClicking) {
-      this.isClicking = isClicking
+    if (remoteData.isClicking !== this.isClicking) {
+      this.isClicking = remoteData.isClicking
 
-      if (isClicking) {
+      if (this.isClicking) {
         this.emit('pointerdown')
       } else {
         this.emit('pointerup')
