@@ -89,9 +89,12 @@ export default class GymoteRemote extends Gymote {
    * this instance's state.
    */
   loop () {
+    window.requestAnimationFrame(this.loop.bind(this))
+
     if (!this.connection.isConnected()) {
       return
     }
+
     // When not clicking the orientation values can be rounded more, so that
     // less messages are sent.
     const rounding = this.isClicking ? 100 : 25
@@ -114,8 +117,6 @@ export default class GymoteRemote extends Gymote {
       this.connection.send(MESSAGE.REMOTE_DATA, remoteDataString)
       this.prevDataString = remoteDataString
     }
-
-    window.requestAnimationFrame(this.loop.bind(this))
   }
 
   /**

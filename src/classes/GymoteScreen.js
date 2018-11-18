@@ -1,5 +1,6 @@
 import Gymote from './Gymote'
 import Smoothing from './Smoothing'
+import { Point } from 'lazy-brush'
 
 import { decodeRemoteData } from './../utils/index.js'
 import { MESSAGE } from './../settings'
@@ -20,6 +21,15 @@ export default class GymoteScreen extends Gymote {
     this.smoothX = new Smoothing(0.3)
     this.smoothY = new Smoothing(0.3)
 
+    this.remoteCoordinates = new Point(0, 0)
+    this.currentCoordinates = new Point(0, 0)
+
+    this.lastDataTimestamp = 0
+    this.lastLoopTimestamp = 0
+
+    this.hasRemoteDelay = false
+
+    this.connection.on('connected', this.onConnected.bind(this))
     this.connection.on(MESSAGE.REMOTE_DATA, this.onRemoteData.bind(this))
   }
 
@@ -33,6 +43,54 @@ export default class GymoteScreen extends Gymote {
     return pairing
   }
 
+  onConnected () {
+    const now = Date.now()
+
+    this.lastDataTimestamp = now
+    this.lastLoopTimestamp = now
+
+    this.loop()
+  }
+
+  loop () {
+    const now = Date.now()
+
+    const dataDelta = now - this.lastDataTimestamp
+    // const frameDelta = now - this.lastFrameTimestamp
+
+    if (dataDelta > 80) {
+      if (!this.hasRemoteDelay) {
+        this.emit('dropstart')
+        this.hasRemoteDelay = true
+      }
+    } else {
+      if (this.hasRemoteDelay) {
+        this.emit('dropend')
+        this.hasRemoteDelay = false
+      }
+    }
+
+    const coordinates = this.getCoordinates(dataDelta)
+
+    if (this.currentCoordinates.x !== coordinates.x || this.currentCoordinates.y !== coordinates.y) {
+      this.emit('pointermove', coordinates)
+      this.currentCoordinates = coordinates
+    }
+
+    this.lastFrameTimestamp = now
+
+    window.requestAnimationFrame(this.loop.bind(this))
+  }
+
+  getCoordinates (dataDelta) {
+    const smoothing = (200 - Math.min(dataDelta, 200)) / 300
+
+    return {
+      x: this.smoothX.next(this.remoteCoordinates.x, false, smoothing),
+      y: this.smoothY.next(this.remoteCoordinates.y, false, smoothing)
+    }
+  }
+
   /**
    * Received from the device of GymoteRemote. The message contains the pointer
    * coordinates, touch coordinates and a boolean indicating if the user is
@@ -41,24 +99,26 @@ export default class GymoteScreen extends Gymote {
    * @param {String} data The data from the Remote.
    */
   onRemoteData (data) {
-    const remoteData = decodeRemoteData(data)
+    const now = Date.now()
 
-    const x = this.smoothX.next(remoteData.coordinates.x)
-    const y = this.smoothY.next(remoteData.coordinates.y)
+    const { coordinates, touch, isClicking } = decodeRemoteData(data)
 
-    this.emit('touch', remoteData.touch)
-    this.emit('pointermove', { x, y })
+    this.remoteCoordinates = coordinates
+    this.lastDataTimestamp = now
+
+    // Emit the touch event.
+    this.emit('touch', touch)
 
     // Check if isClicking has changed since the last time. If it has, then emit
     // the corresponding pointer event.
-    if (remoteData.isClicking !== this.isClicking) {
-      this.isClicking = remoteData.isClicking
-
-      if (this.isClicking) {
+    if (isClicking !== this.isClicking) {
+      if (isClicking) {
         this.emit('pointerdown')
       } else {
         this.emit('pointerup')
       }
+
+      this.isClicking = isClicking
     }
   }
 
