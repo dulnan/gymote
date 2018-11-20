@@ -3,6 +3,8 @@ import EventEmitter from 'eventemitter3'
 import PairingManager from './PairingManager.js'
 import Connection from './Connection.js'
 
+import { EVENT } from './../settings/index.js'
+
 /**
  * The base Gymote class.
  *
@@ -21,13 +23,17 @@ export default class Gymote extends EventEmitter {
     this.pairingManager = new PairingManager(serverUrl, http)
     this.connection = new Connection(serverUrl)
 
-    this.connection.on('connected', (pairing) => {
+    this.connection.on(EVENT.CONNECTED, (pairing) => {
       this.pairingManager.savePairing(pairing, 'remote')
-      this.emit('connected')
+      this.emit(EVENT.CONNECTED)
     })
 
-    this.connection.on('usingFallback', () => {
-      this.emit('usingFallback')
+    this.connection.on(EVENT.USING_FALLBACK, () => {
+      this.emit(EVENT.USING_FALLBACK)
+    })
+
+    this.connection.on(EVENT.CONNECTION_TIMEOUT, () => {
+      this.emit(EVENT.CONNECTION_TIMEOUT)
     })
   }
 
@@ -37,7 +43,7 @@ export default class Gymote extends EventEmitter {
   loadStoredPairings () {
     this.pairingManager.getStoredPairing((pairing) => {
       if (pairing) {
-        this.emit('restorable', pairing)
+        this.emit(EVENT.RESTORABLE, pairing)
       }
     })
   }

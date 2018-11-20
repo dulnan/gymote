@@ -17,8 +17,7 @@ export default class PairingManager {
   /**
    * Check for pairings stored in a cookie, validate them and return them.
    *
-   * @param {Function} cb The callback, receiving a pairing or nothing as an
-   * argument.
+   * @param {Function} cb The callback, which will receive the pairing.
    */
   getStoredPairing (cb) {
     const cookie = Cookies.get('pairing')

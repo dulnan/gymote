@@ -52,8 +52,4 @@ export default class Gyroscope {
       beta: Math.round(this.beta * rounding) / rounding
     }
   }
-
-  center () {
-    this.gyronorm.setHeadDirection()
-  }
 }

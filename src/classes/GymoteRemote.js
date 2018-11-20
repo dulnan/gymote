@@ -4,7 +4,7 @@ import { GyroPlane } from 'gyro-plane'
 import { LazyBrush } from 'lazy-brush'
 
 import { encodeRemoteData } from './../utils'
-import { MESSAGE } from './../settings'
+import { MESSAGE, EVENT } from './../settings'
 
 /**
  * Manages the remote part of a gymote setup.
@@ -40,7 +40,7 @@ export default class GymoteRemote extends Gymote {
 
     this.prevDataString = ''
 
-    this.connection.on('connected', this.onConnected.bind(this))
+    this.connection.on(EVENT.CONNECTED, this.onConnected.bind(this))
     this.connection.on(MESSAGE.SCREEN_VIEWPORT, this.onScreenViewport.bind(this))
     this.connection.on(MESSAGE.SCREEN_DISTANCE, this.onScreenDistance.bind(this))
   }
@@ -145,8 +145,7 @@ export default class GymoteRemote extends Gymote {
    * of the viewport.
    */
   calibrate () {
-    // const offset = this.gyroscope.getOrientation()
-    this.gyroscope.center()
-    // this.gyroplane.updateOffset(offset)
+    const offset = this.gyroscope.getOrientation()
+    this.gyroplane.updateOffset(offset)
   }
 }
