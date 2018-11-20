@@ -1,9 +1,8 @@
 {
   "name": "gymote",
   "version": "0.0.1",
-  "description": "Use your phone as a remote pointing device",
+  "description": "Use your phone as a remote pointing device on a computer",
   "author": "Jan Hug <me@dulnan.net>",
-  "private": true,
   "license": "MIT",
   "keywords": [
     "phone",

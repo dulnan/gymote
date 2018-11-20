@@ -47,6 +47,9 @@ export default class Connection extends EventEmitter {
 
     this.peer.on('close', () => {
       this._isConnected = false
+      this.pairing = null
+      this.peer.pairCode = ''
+      this.emit(EVENT.DISCONNECTED, this.pairing)
     })
 
     this.peer.on('data', (message) => {
@@ -97,6 +100,10 @@ export default class Connection extends EventEmitter {
     this.pairing = pairing
     this.peer.pairCode = pairing.hash
     this.peer.connect()
+  }
+
+  disconnect () {
+    this.peer.close()
   }
 
   /**

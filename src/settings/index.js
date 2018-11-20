@@ -11,6 +11,7 @@ export const EVENT = {
   USING_FALLBACK: 'usingFallback',
   CONNECTION_TIMEOUT: 'connectionTimeout',
   CONNECTION_ERROR: 'connectionError',
+  DISCONNECTED: 'disconnected',
   RESTORABLE: 'restorable',
   LAG_START: 'lagstart',
   LAG_END: 'lagend',

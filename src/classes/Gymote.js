@@ -35,6 +35,10 @@ export default class Gymote extends EventEmitter {
     this.connection.on(EVENT.CONNECTION_TIMEOUT, () => {
       this.emit(EVENT.CONNECTION_TIMEOUT)
     })
+
+    this.connection.on(EVENT.DISCONNECTED, () => {
+      this.emit(EVENT.DISCONNECTED)
+    })
   }
 
   /**
@@ -71,5 +75,9 @@ export default class Gymote extends EventEmitter {
    */
   connect (pairing) {
     this.connection.connect(pairing)
+  }
+
+  disconnect () {
+    this.connection.disconnect()
   }
 }
