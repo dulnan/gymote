@@ -1,7 +1,7 @@
 export const MESSAGE = {
   PING: 'PING',
   REMOTE_DATA: 'RD',
-  REMOTE_OFFSET: 'RO',
+  REMOTE_CALIBRATED: 'RO',
   SCREEN_VIEWPORT: 'SV',
   SCREEN_DISTANCE: 'SD'
 }
@@ -17,6 +17,7 @@ export const EVENT = {
   POINTER_MOVE: 'pointermove',
   POINTER_UP: 'pointerup',
   POINTER_DOWN: 'pointerdown',
+  CALIBRATED: 'calibrated',
   TOUCH: 'touch'
 }
 

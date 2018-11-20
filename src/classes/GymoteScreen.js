@@ -30,6 +30,7 @@ export default class GymoteScreen extends Gymote {
 
     this.connection.on(EVENT.CONNECTED, this.onConnected.bind(this))
     this.connection.on(MESSAGE.REMOTE_DATA, this.onRemoteData.bind(this))
+    this.connection.on(MESSAGE.REMOTE_CALIBRATED, this.onRemoteCalibrated.bind(this))
   }
 
   /**
@@ -48,6 +49,10 @@ export default class GymoteScreen extends Gymote {
     this.lastDataTimestamp = now
 
     this.loop()
+  }
+
+  onRemoteCalibrated () {
+    this.emit(EVENT.CALIBRATED)
   }
 
   /**

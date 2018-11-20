@@ -147,5 +147,6 @@ export default class GymoteRemote extends Gymote {
   calibrate () {
     const offset = this.gyroscope.getOrientation()
     this.gyroplane.updateOffset(offset)
+    this.connection.send(MESSAGE.REMOTE_CALIBRATED)
   }
 }
