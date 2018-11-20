@@ -27,8 +27,7 @@
     "dev": "webpack --progress --colors --watch --env dev",
     "test": "mocha --require babel-register --colors ./test/*.spec.js",
     "test:watch": "mocha --require babel-register --colors -w ./test/*.spec.js",
-    "prepublish": "npm run build",
-    "prepare": "npm run build"
+    "prepublish": "npm run build"
   },
   "dependencies": {
     "@hughsk/fulltilt": "^0.7.1",
