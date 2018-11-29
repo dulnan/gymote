@@ -13,8 +13,8 @@ export default class GymoteScreen extends Gymote {
    * @param {String} serverUrl The URL of the gymote server.
    * @param {*} http A http client, for example axios.
    */
-  constructor (serverUrl, http) {
-    super(serverUrl, http)
+  constructor () {
+    super()
 
     this.isClicking = false
 
@@ -28,9 +28,9 @@ export default class GymoteScreen extends Gymote {
 
     this.hasRemoteDelay = false
 
-    this.connection.on(EVENT.CONNECTED, this.onConnected.bind(this))
-    this.connection.on(MESSAGE.REMOTE_DATA, this.onRemoteData.bind(this))
-    this.connection.on(MESSAGE.REMOTE_CALIBRATED, this.onRemoteCalibrated.bind(this))
+    // this.connection.on(EVENT.CONNECTED, this.onConnected.bind(this))
+    // this.connection.on(MESSAGE.REMOTE_DATA, this.onRemoteData.bind(this))
+    // this.connection.on(MESSAGE.REMOTE_CALIBRATED, this.onRemoteCalibrated.bind(this))
   }
 
   /**
@@ -43,7 +43,7 @@ export default class GymoteScreen extends Gymote {
     return pairing
   }
 
-  onConnected () {
+  start () {
     const now = Date.now()
 
     this.lastDataTimestamp = now
@@ -116,9 +116,9 @@ export default class GymoteScreen extends Gymote {
    * coordinates, touch coordinates and a boolean indicating if the user is
    * clicking.
    *
-   * @param {String} data The data from the Remote.
+   * @param {ArrayBuffer} data The data from the Remote.
    */
-  onRemoteData (data) {
+  handleRemoteData (data) {
     const now = Date.now()
 
     const { coordinates, touch, isClicking } = decodeRemoteData(data)
@@ -150,7 +150,7 @@ export default class GymoteScreen extends Gymote {
    * @param {Number} viewport.height The viewport height.
    */
   sendViewport (viewport) {
-    this.connection.send(MESSAGE.SCREEN_VIEWPORT, JSON.stringify(viewport))
+    // this.connection.send(MESSAGE.SCREEN_VIEWPORT, JSON.stringify(viewport))
   }
 
   /**
@@ -159,6 +159,6 @@ export default class GymoteScreen extends Gymote {
    * @param {Number} distance The distance between screen and remote in pixels.
    */
   sendDistance (distance) {
-    this.connection.send(MESSAGE.SCREEN_DISTANCE, distance.toString())
+    // this.connection.send(MESSAGE.SCREEN_DISTANCE, distance.toString())
   }
 }

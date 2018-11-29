@@ -14,11 +14,9 @@ import { MESSAGE, EVENT } from './../settings'
  */
 export default class GymoteRemote extends Gymote {
   /**
-   * @param {String} serverUrl The URL of the gymote server.
-   * @param {*} http A http client, for example axios.
    */
-  constructor (serverUrl, http) {
-    super(serverUrl, http)
+  constructor () {
+    super()
 
     this.gyroscope = new Gyroscope()
     this.gyroplane = new GyroPlane({
@@ -40,26 +38,25 @@ export default class GymoteRemote extends Gymote {
 
     this.prevDataString = ''
 
-    this.connection.on(EVENT.CONNECTED, this.onConnected.bind(this))
-    this.connection.on(MESSAGE.SCREEN_VIEWPORT, this.onScreenViewport.bind(this))
-    this.connection.on(MESSAGE.SCREEN_DISTANCE, this.onScreenDistance.bind(this))
-  }
+    this.shouldLoop = false
 
-  /**
-   * Given a code, request a pairing from the server.
-   *
-   * @param {Number} code The code to get the pairing from.
-   */
-  async getPairingByCode (code) {
-    const pairing = await this.pairingManager.getHash(code)
-    return pairing
+    this._onDataChange = () => {}
+
+    // this.connection.on(EVENT.CONNECTED, this.onConnected.bind(this))
+    // this.connection.on(MESSAGE.SCREEN_VIEWPORT, this.onScreenViewport.bind(this))
+    // this.connection.on(MESSAGE.SCREEN_DISTANCE, this.onScreenDistance.bind(this))
   }
 
   /**
    * Start the data loop when the connected event is emitted.
    */
-  onConnected () {
+  start () {
+    this.shouldLoop = true
     this.loop()
+  }
+
+  stop () {
+    this.shouldLoop = false
   }
 
   /**
@@ -68,8 +65,7 @@ export default class GymoteRemote extends Gymote {
    * @param {String} message The received message containing the stringified
    * viewport object.
    */
-  onScreenViewport (message) {
-    const viewport = JSON.parse(message)
+  updateScreenViewport (viewport) {
     this.gyroplane.setScreenDimensions(viewport)
   }
 
@@ -79,9 +75,8 @@ export default class GymoteRemote extends Gymote {
    * @param {String} message The received message containing the numeric
    * distance.
    */
-  onScreenDistance (message) {
-    const viewport = parseInt(message)
-    this.gyroplane.setDistance(viewport)
+  updateScreenDistance (distance) {
+    this.gyroplane.setDistance(distance)
   }
 
   /**
@@ -89,11 +84,11 @@ export default class GymoteRemote extends Gymote {
    * this instance's state.
    */
   loop () {
-    window.requestAnimationFrame(this.loop.bind(this))
-
-    if (!this.connection.isConnected()) {
+    if (!this.shouldLoop) {
       return
     }
+
+    window.requestAnimationFrame(this.loop.bind(this))
 
     // When not clicking the orientation values can be rounded more, so that
     // less messages are sent.
@@ -113,10 +108,10 @@ export default class GymoteRemote extends Gymote {
     const remoteDataString = encodeRemoteData({ x: Math.round(x * 10) / 10, y: Math.round(y * 10) / 10 }, this.isClicking, this.touch)
 
     // Only send the message if it actually has changed.
-    if (remoteDataString !== this.prevDataString) {
-      this.connection.send(MESSAGE.REMOTE_DATA, remoteDataString)
+    // if (remoteDataString !== this.prevDataString) {
+      this._onDataChange(remoteDataString)
       this.prevDataString = remoteDataString
-    }
+    // }
   }
 
   /**
@@ -147,6 +142,5 @@ export default class GymoteRemote extends Gymote {
   calibrate () {
     const offset = this.gyroscope.getOrientation()
     this.gyroplane.updateOffset(offset)
-    this.connection.send(MESSAGE.REMOTE_CALIBRATED)
   }
 }

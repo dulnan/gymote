@@ -2,6 +2,7 @@
 
 // const webpack = require('webpack')
 const path = require('path')
+const fs = require('fs')
 const env = require('yargs').argv.env // use --env with webpack 2
 const pkg = require('./package.json')
 
@@ -21,7 +22,7 @@ const config = {
   mode: mode,
   entry: [
     'babel-polyfill',
-    path.join(__dirname,'/src/index.js')
+    path.join(__dirname, '/src/index.js')
   ],
   devtool: 'source-map',
   output: {
@@ -46,9 +47,36 @@ const config = {
     ]
   },
   resolve: {
-    modules: [path.resolve('./node_modules'), path.resolve('./src')],
+    symlinks: false,
+    modules: [
+      path.resolve(__dirname, 'node_modules'),
+      path.resolve(__dirname, 'src')
+    ],
     extensions: ['.json', '.js']
   }
 }
+
+// function findLinkedModules (nodeModulesPath) {
+//   const modules = []
+
+//   fs.readdirSync(nodeModulesPath).forEach(dirname => {
+//     const modulePath = path.resolve(nodeModulesPath, dirname)
+//     const stat = fs.lstatSync(modulePath)
+
+//     if (dirname.startsWith('.')) {
+//       // not a module or scope, ignore
+//     } else if (dirname.startsWith('@')) {
+//       // scoped modules
+//       modules.push(...findLinkedModules(modulePath))
+//     } else if (stat.isSymbolicLink()) {
+//       const realPath = fs.realpathSync(modulePath)
+//       const realModulePath = path.resolve(realPath, 'node_modules')
+
+//       modules.push(realModulePath)
+//     }
+//   })
+
+//   return modules
+// }
 
 module.exports = config
