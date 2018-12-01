@@ -1,10 +1,6 @@
-import Gymote from './Gymote'
 import Gyroscope from './Gyroscope'
 import { GyroPlane } from 'gyro-plane'
 import { LazyBrush } from 'lazy-brush'
-
-import { encodeRemoteData } from './../utils'
-import { MESSAGE, EVENT } from './../settings'
 
 /**
  * Manages the remote part of a gymote setup.
@@ -12,12 +8,8 @@ import { MESSAGE, EVENT } from './../settings'
  * Initializes the Gyroscope class for reading orientation values and a gyro-
  * plane class for calculating the screen coordinates.
  */
-export default class GymoteRemote extends Gymote {
-  /**
-   */
+export default class GymoteRemote {
   constructor () {
-    super()
-
     this.gyroscope = new Gyroscope()
     this.gyroplane = new GyroPlane({
       width: 1280,
@@ -36,15 +28,14 @@ export default class GymoteRemote extends Gymote {
       y: 0
     }
 
-    this.prevDataString = ''
+    this.buffer = new ArrayBuffer(8)
+    this.intArray = new Int16Array(this.buffer, 0, 4)
+
+    this.prevArray = new Int16Array(4)
 
     this.shouldLoop = false
 
     this._onDataChange = () => {}
-
-    // this.connection.on(EVENT.CONNECTED, this.onConnected.bind(this))
-    // this.connection.on(MESSAGE.SCREEN_VIEWPORT, this.onScreenViewport.bind(this))
-    // this.connection.on(MESSAGE.SCREEN_DISTANCE, this.onScreenDistance.bind(this))
   }
 
   /**
@@ -55,6 +46,9 @@ export default class GymoteRemote extends Gymote {
     this.loop()
   }
 
+  /**
+   * Stop the data loop.
+   */
   stop () {
     this.shouldLoop = false
   }
@@ -62,7 +56,7 @@ export default class GymoteRemote extends Gymote {
   /**
    * Received from GymoteScreen when the viewport of the screen device changes.
    *
-   * @param {String} message The received message containing the stringified
+   * @param {string} message The received message containing the stringified
    * viewport object.
    */
   updateScreenViewport (viewport) {
@@ -72,7 +66,7 @@ export default class GymoteRemote extends Gymote {
   /**
    * Received from GymoteScreen when the distance has changed.
    *
-   * @param {String} message The received message containing the numeric
+   * @param {string} message The received message containing the numeric
    * distance.
    */
   updateScreenDistance (distance) {
@@ -104,20 +98,30 @@ export default class GymoteRemote extends Gymote {
     // Get the lazy coordinates.
     const { x, y } = this.lazy.getBrushCoordinates()
 
-    // Build the data string for the message.
-    const remoteDataString = encodeRemoteData({ x: Math.round(x * 10) / 10, y: Math.round(y * 10) / 10 }, this.isClicking, this.touch)
+    // Set the new values to the array.
+    this.intArray.set([
+      Math.round(x),
+      Math.round(y),
+      this.isClicking ? 1 : 0,
+      Math.round(this.touch.y)
+    ], 0)
 
-    // Only send the message if it actually has changed.
-    // if (remoteDataString !== this.prevDataString) {
-      this._onDataChange(remoteDataString)
-      this.prevDataString = remoteDataString
-    // }
+    // Only send the data if it actually has changed.
+    if (
+      this.prevArray[0] !== this.intArray[0] ||
+      this.prevArray[1] !== this.intArray[1] ||
+      this.prevArray[2] !== this.intArray[2] ||
+      this.prevArray[3] !== this.intArray[3]
+    ) {
+      this._onDataChange(this.buffer)
+      this.prevArray.set(this.intArray, 0)
+    }
   }
 
   /**
    * Updates isClicking.
    *
-   * @param {Boolean} isClicking
+   * @param {boolean} isClicking
    */
   updateClick (isClicking) {
     this.isClicking = isClicking
@@ -126,9 +130,9 @@ export default class GymoteRemote extends Gymote {
   /**
    * Update the touch coordinates.
    *
-   * @param {Object} touch The touch position.
-   * @param {Number} touch.x The x coordinate of the touch.
-   * @param {Number} touch.y The y coordinate of the touch.
+   * @param {object} touch The touch position.
+   * @param {number} touch.x The x coordinate of the touch.
+   * @param {number} touch.y The y coordinate of the touch.
    */
   updateTouch (touch) {
     this.touch = touch

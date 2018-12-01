@@ -34,9 +34,7 @@
     "eventemitter3": "^3.1.0",
     "gyro-plane": "^1.0.0",
     "gyronorm": "^2.0.6",
-    "js-cookie": "^2.2.0",
-    "lazy-brush": "^1.0.0",
-    "socketpeer": "github:dulnan/socketpeer#master"
+    "lazy-brush": "^1.0.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.0.0-beta.51",

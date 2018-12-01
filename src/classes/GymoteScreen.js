@@ -1,18 +1,13 @@
-import Gymote from './Gymote'
 import Smoothing from './Smoothing'
-import { Point } from 'lazy-brush'
+import { Point, LazyPoint } from 'lazy-brush'
+import EventEmitter from 'eventemitter3'
 
-import { decodeRemoteData } from './../utils/index.js'
-import { MESSAGE, EVENT } from './../settings'
+import { EVENT } from './../settings'
 
 /**
  * Manages the screen part of a gymote setup.
  */
-export default class GymoteScreen extends Gymote {
-  /**
-   * @param {String} serverUrl The URL of the gymote server.
-   * @param {*} http A http client, for example axios.
-   */
+export default class GymoteScreen extends EventEmitter {
   constructor () {
     super()
 
@@ -21,49 +16,59 @@ export default class GymoteScreen extends Gymote {
     this.smoothX = new Smoothing(0.3)
     this.smoothY = new Smoothing(0.3)
 
-    this.remoteCoordinates = new Point(0, 0)
-    this.currentCoordinates = new Point(0, 0)
+    this.coordinates = new LazyPoint(0, 0)
+    this.touch = new LazyPoint(0, 0)
 
     this.lastDataTimestamp = 0
 
     this.hasRemoteDelay = false
-
-    // this.connection.on(EVENT.CONNECTED, this.onConnected.bind(this))
-    // this.connection.on(MESSAGE.REMOTE_DATA, this.onRemoteData.bind(this))
-    // this.connection.on(MESSAGE.REMOTE_CALIBRATED, this.onRemoteCalibrated.bind(this))
   }
 
   /**
-   * Get a new pairing from the gymote server.
-   *
-   * @returns {Pairing} The pairing containing the code and hash.
+   * Initialize the values for calculating the data delta.
    */
-  async getPairing () {
-    const pairing = await this.pairingManager.requestPairing()
-    return pairing
-  }
-
-  start () {
+  init () {
     const now = Date.now()
-
     this.lastDataTimestamp = now
-
-    this.loop()
-  }
-
-  onRemoteCalibrated () {
-    this.emit(EVENT.CALIBRATED)
   }
 
   /**
-   * Animation loop used to emit events related to receiving the remote data. If
-   * the time delta from the last received message exceeds a certain threshold,
-   * the lagstart event is emitted, and if it goes below again, emit the lagend
-   * event.
+   * Get the smoothed coordinates from the last received remote message.
+   * Depending on the given dataDelta, the smoothing is adjusted. With that,
+   * when a small lag has happened, the pointer is not moved immediately to the
+   * new position.
+   *
+   * @param {Number} x The new x coordinate from the remote.
+   * @param {Number} y The new y coordinate from the remote.
+   * @param {Number} dataDelta The delta in ms from the last message.
    */
-  loop () {
-    // Get the current timestamp.
+  getCoordinates (x, y, dataDelta) {
+    const smoothing = (200 - Math.min(dataDelta, 200)) / 300
+
+    return new Point(
+      Math.round(this.smoothX.next(x, false, smoothing)),
+      Math.round(this.smoothY.next(y, false, smoothing))
+    )
+  }
+
+  /**
+   * Received from the device of GymoteRemote. The message contains the pointer
+   * coordinates, touch coordinates and a boolean indicating if the user is
+   * clicking.
+   *
+   * The data is received as Uint8Array, but has been sent as Int16Array. So we
+   * take the buffer of the typed array and create a new one with the correct
+   * type.
+   *
+   * @param {Uint8Array} data The data from the Remote.
+   */
+  handleRemoteData (data) {
+    // Create a new array with the correct type.
+    const intArray = new Int16Array(data.buffer)
+
+    // Get and set the current timestamp.
     const now = Date.now()
+    this.lastDataTimestamp = now
 
     // Calculate the time delta.
     const dataDelta = now - this.lastDataTimestamp
@@ -81,53 +86,32 @@ export default class GymoteScreen extends Gymote {
       }
     }
 
-    const coordinates = this.getCoordinates(dataDelta)
+    this._touchDataHandler(0, intArray[3] || 0)
+    this._pointerDataHandler(
+      intArray[0] || 0,
+      intArray[1] || 0,
+      (intArray[2] || 0) === 1,
+      dataDelta
+    )
+  }
+
+  /**
+   * Handle incoming coordinate data for the pointer.
+   *
+   * @param {number} x The new x coordinate of the remote.
+   * @param {number} y The new y coordinate of the remote.
+   * @param {boolean} isClicking If the pointer is clicking.
+   * @param {number} dataDelta The time delta in ms since the last message.
+   */
+  _pointerDataHandler (x, y, isClicking, dataDelta) {
+    // Get the new coordinates.
+    const newCoordinates = this.getCoordinates(x, y, dataDelta)
 
     // Only emit the pointermove event if the coordinates have actually changed.
-    if (this.currentCoordinates.x !== coordinates.x || this.currentCoordinates.y !== coordinates.y) {
-      this.emit(EVENT.POINTER_MOVE, coordinates)
-      this.currentCoordinates = coordinates
+    if (!this.coordinates.equalsTo(newCoordinates)) {
+      this.emit(EVENT.POINTER_MOVE, newCoordinates)
+      this.coordinates.update(newCoordinates)
     }
-
-    this.lastFrameTimestamp = now
-
-    window.requestAnimationFrame(this.loop.bind(this))
-  }
-
-  /**
-   * Get the smoothed coordinates from the last received remote message.
-   * Depending on the given dataDelta, the smoothing is adjusted. With that,
-   * when a small lag has happened, the pointer is not moved immediately to the
-   * new position.
-   *
-   * @param {Number} dataDelta The time delta from the last received message.
-   */
-  getCoordinates (dataDelta) {
-    const smoothing = (200 - Math.min(dataDelta, 200)) / 300
-
-    return {
-      x: this.smoothX.next(this.remoteCoordinates.x, false, smoothing),
-      y: this.smoothY.next(this.remoteCoordinates.y, false, smoothing)
-    }
-  }
-
-  /**
-   * Received from the device of GymoteRemote. The message contains the pointer
-   * coordinates, touch coordinates and a boolean indicating if the user is
-   * clicking.
-   *
-   * @param {ArrayBuffer} data The data from the Remote.
-   */
-  handleRemoteData (data) {
-    const now = Date.now()
-
-    const { coordinates, touch, isClicking } = decodeRemoteData(data)
-
-    this.remoteCoordinates = coordinates
-    this.lastDataTimestamp = now
-
-    // Emit the touch event.
-    this.emit(EVENT.TOUCH, touch)
 
     // Check if isClicking has changed since the last time. If it has, then emit
     // the corresponding pointer event.
@@ -143,22 +127,17 @@ export default class GymoteScreen extends Gymote {
   }
 
   /**
-   * Send the viewport size to the Remote device.
+   * Handle incoming touch data.
    *
-   * @param {Object} viewport The viewport.
-   * @param {Number} viewport.width The viewport width.
-   * @param {Number} viewport.height The viewport height.
+   * @param {Number} x The x coordinates of the touchmove.
+   * @param {Number} y The y coordinates of the touchmove.
    */
-  sendViewport (viewport) {
-    // this.connection.send(MESSAGE.SCREEN_VIEWPORT, JSON.stringify(viewport))
-  }
+  _touchDataHandler (x, y) {
+    const newTouch = new Point(x, y)
 
-  /**
-   * Send the distance to the Remote device.
-   *
-   * @param {Number} distance The distance between screen and remote in pixels.
-   */
-  sendDistance (distance) {
-    // this.connection.send(MESSAGE.SCREEN_DISTANCE, distance.toString())
+    if (!this.touch.equalsTo(newTouch)) {
+      this.emit(EVENT.TOUCH, newTouch)
+      this.touch.update(newTouch)
+    }
   }
 }
