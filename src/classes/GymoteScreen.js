@@ -60,11 +60,11 @@ export default class GymoteScreen extends EventEmitter {
    * take the buffer of the typed array and create a new one with the correct
    * type.
    *
-   * @param {Uint8Array} data The data from the Remote.
+   * @param {ArrayBuffer} data The data from the Remote.
    */
-  handleRemoteData (data) {
+  handleRemoteData (buffer) {
     // Create a new array with the correct type.
-    const intArray = new Int16Array(data.buffer)
+    const intArray = new Int16Array(buffer)
 
     // Get and set the current timestamp.
     const now = Date.now()
