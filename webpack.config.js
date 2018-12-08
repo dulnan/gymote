@@ -2,19 +2,14 @@
 
 // const webpack = require('webpack')
 const path = require('path')
-const env = require('yargs').argv.env // use --env with webpack 2
+// const env = require('yargs').argv.env // use --env with webpack 2
 const pkg = require('./package.json')
 
 let libraryName = pkg.name
 
-let outputFile, mode
-
-if (env === 'build') {
-  outputFile = libraryName + '.js'
-}
+const outputFile = libraryName + '.js'
 
 const config = {
-  mode: mode,
   optimization: {
     minimize: false
   },

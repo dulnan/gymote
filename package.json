@@ -1,6 +1,6 @@
 {
   "name": "gymote",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Use your phone as a remote pointing device on a computer",
   "author": "Jan Hug <me@dulnan.net>",
   "license": "MIT",
@@ -23,8 +23,8 @@
     "url": "https://github.com/dulnan/gymote.git"
   },
   "scripts": {
-    "build": "webpack --env dev && webpack --env build",
-    "dev": "webpack --progress --colors --watch --env dev",
+    "build": "webpack --env build --mode production",
+    "dev": "webpack --progress --colors --watch --env dev --mode development",
     "test": "mocha --require babel-register --colors ./test/*.spec.js",
     "test:watch": "mocha --require babel-register --colors -w ./test/*.spec.js",
     "prepublish": "npm run build"
