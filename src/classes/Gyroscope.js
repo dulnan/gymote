@@ -10,7 +10,8 @@ export default class Gyroscope {
   constructor () {
     this.gyronorm = new GyroNorm()
 
-    this.hasGyroscope = false
+    this._hasGyroscope = null
+    this._hasGyroscopeResolve = null
 
     this.alpha = 0
     this.beta = 0
@@ -18,25 +19,42 @@ export default class Gyroscope {
     this.initGyroNorm()
   }
 
+  hasGyroscope () {
+    return new Promise((resolve, reject) => {
+      if (this._hasGyroscope !== null) {
+        return resolve(this._hasGyroscope)
+      }
+
+      this._hasGyroscopeResolve = resolve
+    })
+  }
+
   /**
    * Initialize GyroNorm.
    */
   initGyroNorm () {
     this.gyronorm.init(GYRONORM_OPTIONS).then(() => {
-      const isAvailable = this.gyronorm.isAvailable()
+      const { deviceOrientationAvailable } = this.gyronorm.isAvailable()
 
-      if (isAvailable) {
-        this.hasGyroscope = true
-
-        this.gyronorm.start((data) => {
-          this.alpha = data.do.alpha
-          this.beta = data.do.beta
-        })
+      if (deviceOrientationAvailable) {
+        this._hasGyroscope = true
+        this.start()
       } else {
-        this.hasGyroscope = false
+        this._hasGyroscope = false
       }
-    }).catch((e) => {
-      this.hasGyroscope = false
+    }).catch(() => {
+      this._hasGyroscope = false
+    }).finally(() => {
+      if (this._hasGyroscopeResolve) {
+        this._hasGyroscopeResolve(this._hasGyroscope)
+      }
+    })
+  }
+
+  start () {
+    this.gyronorm.start((data) => {
+      this.alpha = data.do.alpha
+      this.beta = data.do.beta
     })
   }
 

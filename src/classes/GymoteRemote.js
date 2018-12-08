@@ -38,6 +38,10 @@ export default class GymoteRemote {
     this._onDataChange = () => {}
   }
 
+  deviceHasGyroscope () {
+    return this.gyroscope.hasGyroscope()
+  }
+
   /**
    * Start the data loop when the connected event is emitted.
    */
