@@ -1,0 +1,32 @@
+{
+  "tags": {
+    "allowUnknownTags": true,
+    "dictionaries": ["jsdoc"]
+  },
+  "source": {
+    "include": [
+      "src/index.js",
+      "src/classes/GymoteRemote.js",
+      "src/classes/GymoteScreen.js",
+      "src/classes/Gyroscope.js",
+      "README.md"
+    ],
+    "includePattern": ".js$",
+    "excludePattern": "(node_modules/|docs|utils)"
+  },
+  "plugins": ["plugins/markdown"],
+  "templates": {
+    "referenceTitle": "Gymote Documentation",
+    "cleverLinks": true,
+    "monospaceLinks": true,
+    "useLongnameInNav": false,
+    "showInheritedInNav": true
+  },
+  "opts": {
+    "destination": "./docs/",
+    "encoding": "utf8",
+    "private": false,
+    "recurse": true,
+    "template": "./node_modules/jsdoc-template"
+  }
+}

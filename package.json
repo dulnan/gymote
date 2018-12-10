@@ -25,6 +25,7 @@
   "scripts": {
     "build": "webpack --env build --mode production",
     "dev": "webpack --progress --colors --watch --env dev --mode development",
+    "docs": "rm -rf ./docs && node_modules/.bin/jsdoc --configure .jsdoc.json --verbose",
     "test": "mocha --require babel-register --colors ./test/*.spec.js",
     "test:watch": "mocha --require babel-register --colors -w ./test/*.spec.js",
     "prepublish": "npm run build"
@@ -55,7 +56,9 @@
     "eslint-plugin-node": "^8.0.0",
     "eslint-plugin-promise": "^4.0.1",
     "eslint-plugin-standard": "^4.0.0",
+    "jsdoc": "^3.5.5",
     "jsdom": "11.11.0",
+    "jsdoc-template": "github:braintree/jsdoc-template",
     "jsdom-global": "3.0.2",
     "mocha": "^4.0.1",
     "uglifyjs-webpack-plugin": "^1.2.7",

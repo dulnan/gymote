@@ -10,7 +10,14 @@
  * @property {number} y The x coordinate.
  */
 
+/**
+  * @module GymoteScreen
+  */
 import GymoteScreen from './classes/GymoteScreen'
+
+/**
+  * @module GymoteRemote
+  */
 import GymoteRemote from './classes/GymoteRemote'
 
 export default { GymoteRemote, GymoteScreen }

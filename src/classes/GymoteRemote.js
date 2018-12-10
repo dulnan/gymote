@@ -7,8 +7,36 @@ import { LazyBrush } from 'lazy-brush'
  *
  * Initializes the Gyroscope class for reading orientation values and a gyro-
  * plane class for calculating the screen coordinates.
+ *
+ * @example
+ * const gymote = new GymoteRemote()
+ *
+ * // First check if the device has a gyroscope. This function returns a
+ * // promise, so wait until it has been resolved and then attach functions,
+ * // event listeners and start reading the values.
+ * gymote.deviceHasGyroscope().then((hasGyroscope) => {
+ *   if (hasGyroscope) {
+ *     // Set the function responsible to send data to the peer.
+ *     gymote._onDataChange = peerConnection.send.bind(peerConnection)
+ *
+ *     // Start the reading of the gyroscope values.
+ *     gymote.start()
+ *
+ *     // Assuming you have a button to function as the "mouse button", attach
+ *     // touch event listeners to update the clicking state.
+ *     myButton.addEventListener('touchstart', () => {
+ *       gymote.updateClick(true)
+ *     })
+ *
+ *     myButton.addEventListener('touchend', () => {
+ *       gymote.updateClick(false)
+ *     }
+ *   }
+ * })
+ *
+ * @class
  */
-export default class GymoteRemote {
+class GymoteRemote {
   constructor () {
     this.gyroscope = new Gyroscope()
     this.gyroplane = new GyroPlane({
@@ -38,6 +66,11 @@ export default class GymoteRemote {
     this._onDataChange = () => {}
   }
 
+  /**
+   * Check if the device has a gyroscope and it can be accessed.
+   *
+   * @returns {Promise<boolean>}
+   */
   deviceHasGyroscope () {
     return this.gyroscope.hasGyroscope()
   }
@@ -152,3 +185,5 @@ export default class GymoteRemote {
     this.gyroplane.updateOffset(offset)
   }
 }
+
+export default GymoteRemote

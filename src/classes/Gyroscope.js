@@ -5,8 +5,11 @@ require('@hughsk/fulltilt/dist/fulltilt.min.js')
 
 /**
  * Initializes GyroNorm for reading the orientation from the gyroscope.
+ *
+ * @private
+ * @class
  */
-export default class Gyroscope {
+class Gyroscope {
   constructor () {
     this.gyronorm = new GyroNorm()
 
@@ -51,6 +54,9 @@ export default class Gyroscope {
     })
   }
 
+  /**
+   * Start reading the values from the gyroscope and store them continously.
+   */
   start () {
     this.gyronorm.start((data) => {
       this.alpha = data.do.alpha
@@ -71,3 +77,5 @@ export default class Gyroscope {
     }
   }
 }
+
+export default Gyroscope

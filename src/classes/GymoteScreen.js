@@ -6,8 +6,37 @@ import { EVENT } from './../settings'
 
 /**
  * Manages the screen part of a gymote setup.
+ *
+ * It needs to receive the result from the GymoteRemote onDataChange function.
+ * The data needs to be passed to the handleRemoteData function where it is
+ * processed and the matching events emitted.
+ *
+ * @example
+ * const gymote = new GymoteScreen()
+ *
+ * // Directly pass incoming data (e.g. from a WebRTC data connection) to the
+ * // remote data handler.
+ * peerConnection.on('data', gymote.handleRemoteData.bind(gymote))
+ *
+ * gymote.on('pointermove', ({ x, y }) => {
+ *   // Do something with the coordinates.
+ * })
+ *
+ * gymote.on('touch', ({ x, y }) => {
+ *   // The touch position has changed.
+ * })
+ *
+ * @class
+ * @extends EventEmitter
+ * @fires GymoteScreen#lagstart
+ * @fires GymoteScreen#lagend
+ * @fires GymoteScreen#pointermove
+ * @fires GymoteScreen#pointerup
+ * @fires GymoteScreen#pointerdown
+ * @fires GymoteScreen#calibrated
+ * @fires GymoteScreen#touch
  */
-export default class GymoteScreen extends EventEmitter {
+class GymoteScreen extends EventEmitter {
   constructor () {
     super()
 
@@ -22,14 +51,6 @@ export default class GymoteScreen extends EventEmitter {
     this.lastDataTimestamp = 0
 
     this.hasRemoteDelay = false
-  }
-
-  /**
-   * Initialize the values for calculating the data delta.
-   */
-  init () {
-    const now = Date.now()
-    this.lastDataTimestamp = now
   }
 
   /**
@@ -98,6 +119,7 @@ export default class GymoteScreen extends EventEmitter {
   /**
    * Handle incoming coordinate data for the pointer.
    *
+   * @private
    * @param {number} x The new x coordinate of the remote.
    * @param {number} y The new y coordinate of the remote.
    * @param {boolean} isClicking If the pointer is clicking.
@@ -129,6 +151,7 @@ export default class GymoteScreen extends EventEmitter {
   /**
    * Handle incoming touch data.
    *
+   * @private
    * @param {Number} x The x coordinates of the touchmove.
    * @param {Number} y The y coordinates of the touchmove.
    */
@@ -141,3 +164,100 @@ export default class GymoteScreen extends EventEmitter {
     }
   }
 }
+
+/**
+ * The remote lag has exceeded the threshold.
+ *
+ * @member
+ * @event GymoteScreen#lagstart
+ */
+
+/**
+ * @member
+ * @type {string}
+ */
+GymoteScreen.EVENT_LAG_START = EVENT.LAG_START
+
+/**
+ * The remote lag has returned below the threshold.
+ *
+ * @member
+ * @event GymoteScreen#lagend
+ */
+
+/**
+ * @member
+ * @type {string}
+ */
+GymoteScreen.EVENT_LAG_END = EVENT.LAG_END
+
+/**
+ * The pointer has moved.
+ *
+ * @member
+ * @event GymoteScreen#pointermove
+ * @type {ScreenPoint}
+ */
+
+/**
+ * @member
+ * @type {string}
+ */
+GymoteScreen.EVENT_POINTER_MOVE = EVENT.POINTER_MOVE
+
+/**
+ * The pointer was released.
+ *
+ * @member
+ * @event GymoteScreen#pointerup
+ * @type {ScreenPoint}
+ */
+
+/**
+ * @member
+ * @type {string}
+ */
+GymoteScreen.EVENT_POINTER_UP = EVENT.POINTER_UP
+
+/**
+ * The pointer is pressing.
+ *
+ * @member
+ * @event GymoteScreen#pointerdown
+ * @type {ScreenPoint}
+ */
+
+/**
+ * @member
+ * @type {string}
+ */
+GymoteScreen.EVENT_POINTER_DOWN = EVENT.POINTER_DOWN
+
+/**
+ * The gyroscope has been calibrated.
+ *
+ * @member
+ * @event GymoteScreen#calibrated
+ */
+
+/**
+ * @member
+ * @type {string}
+ */
+GymoteScreen.EVENT_CALIBRATED = EVENT.CALIBRATED
+
+/**
+ * The touch values have changed.
+ *
+ * @member
+ * @event GymoteScreen#touch
+ * @type {ScreenPoint}
+ */
+
+/**
+ * @member
+ * @type {string}
+ */
+GymoteScreen.EVENT_TOUCH = EVENT.TOUCH
+
+export default GymoteScreen
