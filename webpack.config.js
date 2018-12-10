@@ -14,7 +14,6 @@ const config = {
     minimize: false
   },
   entry: [
-    'babel-polyfill',
     path.join(__dirname, '/src/index.js')
   ],
   devtool: 'source-map',
