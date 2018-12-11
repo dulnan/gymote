@@ -2,7 +2,7 @@
 JavaScript library to use a device with a gyroscope (like every smartphone from
 the last few years) as a pointing device for a screen.
 
-[Documentatin / API](https://gymote.dulnan.net)
+[Documentation / API](https://gymote.dulnan.net)
 
 <hr>
 
