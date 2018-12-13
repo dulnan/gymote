@@ -45,12 +45,11 @@ class Gyroscope {
       } else {
         this._hasGyroscope = false
       }
+
+      this._hasGyroscopeResolve(this._hasGyroscope)
     }).catch(() => {
       this._hasGyroscope = false
-    }).finally(() => {
-      if (this._hasGyroscopeResolve) {
-        this._hasGyroscopeResolve(this._hasGyroscope)
-      }
+      this._hasGyroscopeResolve(this._hasGyroscope)
     })
   }
 
