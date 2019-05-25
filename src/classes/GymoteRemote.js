@@ -128,9 +128,12 @@ class GymoteRemote {
 
     this.gyroplane.updateOrientation(orientation)
 
-    const coordinates = this.gyroplane.getScreenCoordinates()
-
-    this.lazy.update(coordinates)
+    try {
+      const coordinates = this.gyroplane.getScreenCoordinates()
+      this.lazy.update(coordinates)
+    } catch (e) {
+      this.gyroplane.init()
+    }
 
     // Get the lazy coordinates.
     const { x, y } = this.lazy.getBrushCoordinates()
