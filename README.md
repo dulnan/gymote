@@ -32,6 +32,12 @@ changes. The remote doesn't emit an event for that, you have to pass a function
 which will received the data as the first argument. In there you send the data
 via your WebRTC or WebSocket connection.
 
+### Requesting access to gyroscope
+Starting with iOS 12.2 accessing device motion data (like gyroscope) requires
+permission from the user. As of September 2019 there is no way to check if
+permission has been granted, so the best bet is to ask for permission on every
+page load.
+
 ## GymoteScreen
 The "receiving" end is mostly responsible for emitting events based on the
 incoming remote data. The data (ArrayBuffer) is passed to the handleRemoteData

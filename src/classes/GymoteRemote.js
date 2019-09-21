@@ -16,21 +16,24 @@ import { LazyBrush } from 'lazy-brush'
  * // event listeners and start reading the values.
  * gymote.deviceHasGyroscope().then((hasGyroscope) => {
  *   if (hasGyroscope) {
- *     // Set the function responsible to send data to the peer.
- *     gymote._onDataChange = peerConnection.send.bind(peerConnection)
+ *     // Request access to gyroscope data.
+ *     gymote.requestGyroscopePermission().then(isGranted => {
+ *       // Set the function responsible to send data to the peer.
+ *       gymote._onDataChange = peerConnection.send.bind(peerConnection)
  *
- *     // Start the reading of the gyroscope values.
- *     gymote.start()
+ *       // Start the reading of the gyroscope values.
+ *       gymote.start()
  *
- *     // Assuming you have a button to function as the "mouse button", attach
- *     // touch event listeners to update the clicking state.
- *     myButton.addEventListener('touchstart', () => {
- *       gymote.updateClick(true)
- *     })
+ *       // Assuming you have a button to function as the "mouse button", attach
+ *       // touch event listeners to update the clicking state.
+ *       myButton.addEventListener('touchstart', () => {
+ *         gymote.updateClick(true)
+ *       })
  *
- *     myButton.addEventListener('touchend', () => {
- *       gymote.updateClick(false)
- *     }
+ *       myButton.addEventListener('touchend', () => {
+ *         gymote.updateClick(false)
+ *       }
+*      })
  *   }
  * })
  *
@@ -64,6 +67,18 @@ class GymoteRemote {
     this.shouldLoop = false
 
     this._onDataChange = () => {}
+  }
+
+  /**
+   * if the device requires user permission to access DeviceMotion events, this
+   * will trigger the dialog asking the user for permission. Promise is
+   * resolved once access has been granted or rejected.
+   *
+   * @returns {Promise<boolean>} True if permission has been granted or is not
+   * required by device.
+   */
+  requestGyroscopePermission () {
+    return this.gyroscope.requestPermission()
   }
 
   /**

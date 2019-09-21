@@ -19,7 +19,28 @@ class Gyroscope {
     this.alpha = 0
     this.beta = 0
 
-    this.initGyroNorm()
+    this._needsPermission = !!(window.DeviceMotionEvent) &&
+      typeof window.DeviceMotionEvent.requestPermission === 'function'
+  }
+
+  needsPermission () {
+    return this._needsPermission
+  }
+
+  requestPermission () {
+    if (!this._needsPermission) {
+      return Promise.resolve(true)
+    }
+
+    return window.DeviceMotionEvent.requestPermission().then(response => {
+      const isGranted = response === 'granted'
+
+      if (isGranted) {
+        this.initGyroNorm()
+      }
+
+      return isGranted
+    })
   }
 
   hasGyroscope () {
@@ -46,10 +67,15 @@ class Gyroscope {
         this._hasGyroscope = false
       }
 
-      this._hasGyroscopeResolve(this._hasGyroscope)
+      if (this._hasGyroscopeResolve) {
+        this._hasGyroscopeResolve(this._hasGyroscope)
+      }
     }).catch(() => {
       this._hasGyroscope = false
-      this._hasGyroscopeResolve(this._hasGyroscope)
+
+      if (this._hasGyroscopeResolve) {
+        this._hasGyroscopeResolve(this._hasGyroscope)
+      }
     })
   }
 
